@@ -79,57 +79,96 @@ st.sidebar.success("Model berhasil dimuat")
 # Judul
 # =========================
 st.title("🎀 IoT Vulnerability Classification")
-st.write("Upload dataset CSV untuk melakukan prediksi kerentanan perangkat IoT.")
+st.write("Prediksi kerentanan perangkat IoT menggunakan Machine Learning")
 
 # =========================
-# Upload CSV
+# Tabs
 # =========================
-uploaded_file = st.file_uploader(
-    "📂 Upload file CSV",
-    type=["csv"]
-)
+tab1, tab2 = st.tabs(["🧠 Input Manual", "📂 Upload CSV"])
 
-# =========================
-# Prediksi Otomatis
-# =========================
-if uploaded_file is not None:
+# ==================================================
+# TAB INPUT MANUAL
+# ==================================================
+with tab1:
 
-    try:
-        # Load CSV
-        data = pd.read_csv(uploaded_file)
+    st.subheader("Input Nilai Fitur Jaringan IoT")
 
-        st.subheader("📊 Dataset")
-        st.dataframe(data.head())
+    col1, col2 = st.columns(2)
 
-        st.info(f"Jumlah data: {data.shape[0]} baris | {data.shape[1]} kolom")
+    with col1:
+        dur = st.number_input("dur", value=0.0004)
+        protocol = st.number_input("Protocol", value=30)
+        length = st.number_input("Length", value=54)
+        source_host = st.number_input("Source Host", value=60674)
 
-        # Ambil fitur numerik
-        data_numeric = data.select_dtypes(include=['int64', 'float64'])
+    with col2:
+        destination_host = st.number_input("Destination Host", value=3472)
+        sender_ip = st.number_input("Sender IP address", value=1)
+        target_ip = st.number_input("Target IP address", value=1)
 
-        # Hapus kolom prediction jika ada
-        if 'Prediction' in data_numeric.columns:
-            data_numeric = data_numeric.drop(columns=['Prediction'])
+    if st.button("🎯 Prediksi Manual"):
 
-        # Prediksi otomatis
-        prediction = model.predict(data_numeric)
+        input_data = pd.DataFrame([{
+            'dur': dur,
+            'Protocol': protocol,
+            'Length': length,
+            'Source Host': source_host,
+            'Destination Host': destination_host,
+            'Sender IP address': sender_ip,
+            'Target IP address': target_ip
+        }])
 
-        # Tambahkan hasil
-        data['Prediction'] = prediction
+        st.success("Input berhasil dimasukkan 🎉")
+        st.dataframe(input_data)
 
-        st.success("🎉 Prediksi berhasil dilakukan")
+# ==================================================
+# TAB UPLOAD CSV
+# ==================================================
+with tab2:
 
-        st.subheader("📈 Hasil Prediksi")
-        st.dataframe(data.head())
+    uploaded_file = st.file_uploader(
+        "📂 Upload file CSV",
+        type=["csv"]
+    )
 
-        # Download hasil
-        csv = data.to_csv(index=False).encode('utf-8')
+    if uploaded_file is not None:
 
-        st.download_button(
-            label="⬇ Download Hasil Prediksi",
-            data=csv,
-            file_name='hasil_prediksi.csv',
-            mime='text/csv'
-        )
+        try:
+            # Load CSV
+            data = pd.read_csv(uploaded_file)
 
-    except Exception as e:
-        st.error(f"Terjadi kesalahan: {e}")
+            st.subheader("📊 Dataset")
+            st.dataframe(data.head())
+
+            st.info(f"Jumlah data: {data.shape[0]} baris | {data.shape[1]} kolom")
+
+            # Ambil fitur numerik
+            data_numeric = data.select_dtypes(include=['int64', 'float64'])
+
+            # Hapus kolom prediction jika ada
+            if 'Prediction' in data_numeric.columns:
+                data_numeric = data_numeric.drop(columns=['Prediction'])
+
+            # Prediksi otomatis
+            prediction = model.predict(data_numeric)
+
+            # Tambahkan hasil
+            data['Prediction'] = prediction
+
+            st.success("🎉 Prediksi berhasil dilakukan")
+
+            st.subheader("📈 Hasil Prediksi")
+            st.dataframe(data.head())
+
+            # Download hasil
+            csv = data.to_csv(index=False).encode('utf-8')
+
+            st.download_button(
+                label="⬇ Download Hasil Prediksi",
+                data=csv,
+                file_name='hasil_prediksi.csv',
+                mime='text/csv'
+            )
+
+        except Exception as e:
+            st.error(f"Terjadi kesalahan: {e}")
