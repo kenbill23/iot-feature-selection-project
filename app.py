@@ -16,6 +16,35 @@ st.set_page_config(
 )
 
 # =========================
+# Styling Pink UI
+# =========================
+st.markdown("""
+    <style>
+    .stApp {
+        background-color: #ffc0cb;
+    }
+
+    h1, h2, h3, p, label {
+        color: black;
+    }
+
+    .stButton>button {
+        background-color: #ff69b4;
+        color: white;
+        border-radius: 10px;
+        border: none;
+    }
+
+    .stDownloadButton>button {
+        background-color: #ff69b4;
+        color: white;
+        border-radius: 10px;
+        border: none;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# =========================
 # Judul
 # =========================
 st.title("IoT Vulnerability Classification")
