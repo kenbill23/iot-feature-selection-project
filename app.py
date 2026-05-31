@@ -66,7 +66,7 @@ def load_model():
 model = load_model()
 
 # =========================
-# Mapping Label
+# Label Mapping
 # =========================
 label_mapping = {
     0: 'ARPPoisoning',
@@ -86,38 +86,44 @@ label_mapping = {
 # =========================
 # Sidebar
 # =========================
-st.sidebar.title("🎀 About App")
+st.sidebar.title("🎀 IoT Vulnerability")
 
-st.sidebar.write(
-    "Aplikasi Machine Learning untuk klasifikasi kerentanan IoT menggunakan model terbaik hasil training."
-)
-
-st.sidebar.success("Model berhasil dimuat")
+st.sidebar.success("✅ Model Loaded")
 
 st.sidebar.markdown("---")
 
-st.sidebar.subheader("📌 Fitur")
+st.sidebar.subheader("📌 Deskripsi")
 
-st.sidebar.write("""
-✅ Upload Dataset CSV
+st.sidebar.info(
+    "Sistem klasifikasi serangan IoT menggunakan model Machine Learning terbaik hasil training."
+)
 
-✅ Prediksi Kerentanan IoT
+st.sidebar.markdown("---")
 
-✅ Download Hasil Prediksi
+st.sidebar.subheader("🏆 Model Terbaik")
 
-✅ Pipeline Machine Learning
+st.sidebar.markdown("""
+**Random Forest Classifier**
+
+**Best Score Cross Validation:** 95.69%
+
+**Best Parameters**
+- model__n_estimators = 10
+- model__max_depth = 5
+- feature_selection__estimator__n_estimators = 5
+- feature_selection__estimator__max_depth = 5
 """)
 
 st.sidebar.markdown("---")
 
-st.sidebar.subheader("👩‍💻 Kelompok")
+st.sidebar.subheader("👥 Kelompok")
 
-st.sidebar.write("""
-Nabilla Wulan
+st.sidebar.markdown("""
+**Nabilla Wulandari** — 8020230008
 
-Fadilla
+**Fadillah Dwi Cahyanti** — 8020230023
 
-Revi
+**Revi Febrianti** — 8020230084
 """)
 
 # =========================
@@ -135,7 +141,7 @@ st.markdown("---")
 # Upload CSV
 # =========================
 uploaded_file = st.file_uploader(
-    "📂 Upload file CSV",
+    "📂 Upload File CSV",
     type=["csv"]
 )
 
@@ -143,14 +149,17 @@ if uploaded_file is not None:
 
     try:
 
-        # Load dataset
+        # =========================
+        # Load Dataset
+        # =========================
         data = pd.read_csv(uploaded_file)
 
         st.subheader("📊 Dataset")
 
         st.dataframe(
             data.head(),
-            use_container_width=True
+            width="stretch",
+            hide_index=True
         )
 
         st.info(
@@ -158,7 +167,7 @@ if uploaded_file is not None:
         )
 
         # =========================
-        # Menyesuaikan fitur training
+        # Sesuaikan fitur training
         # =========================
         if hasattr(model, "feature_names_in_"):
 
@@ -191,8 +200,8 @@ if uploaded_file is not None:
         ]
 
         hasil = pd.DataFrame({
-            "Kode_Prediksi": prediction,
-            "Jenis_Serangan": prediction_label
+            "Kode Prediksi": prediction,
+            "Jenis Serangan": prediction_label
         })
 
         st.success("🎉 Prediksi berhasil dilakukan")
@@ -201,12 +210,13 @@ if uploaded_file is not None:
 
         st.dataframe(
             hasil,
+            hide_index=True,
             height=350,
-            use_container_width=True
+            width="stretch"
         )
 
         # =========================
-        # Download hasil
+        # Download Hasil
         # =========================
         csv = hasil.to_csv(
             index=False
