@@ -66,9 +66,28 @@ def load_model():
 model = load_model()
 
 # =========================
+# Mapping Label
+# =========================
+label_mapping = {
+    0: 'ARPPoisoning',
+    1: 'Backdoor',
+    2: 'ICMPflood',
+    3: 'ICMPredirect',
+    4: 'Normal',
+    5: 'Password_crack',
+    6: 'Port_Scanning',
+    7: 'SQLInjection',
+    8: 'SYN_FLOOD',
+    9: 'Smurf',
+    10: 'UDP_flood',
+    11: 'VUlnerability_Scan'
+}
+
+# =========================
 # Sidebar
 # =========================
 st.sidebar.title("🎀 About App")
+
 st.sidebar.write(
     "Aplikasi Machine Learning untuk klasifikasi kerentanan IoT menggunakan model terbaik hasil training."
 )
@@ -78,6 +97,7 @@ st.sidebar.success("Model berhasil dimuat")
 st.sidebar.markdown("---")
 
 st.sidebar.subheader("📌 Fitur")
+
 st.sidebar.write("""
 ✅ Upload Dataset CSV
 
@@ -91,6 +111,7 @@ st.sidebar.write("""
 st.sidebar.markdown("---")
 
 st.sidebar.subheader("👩‍💻 Kelompok")
+
 st.sidebar.write("""
 Nabilla Wulan
 
@@ -126,6 +147,7 @@ if uploaded_file is not None:
         data = pd.read_csv(uploaded_file)
 
         st.subheader("📊 Dataset")
+
         st.dataframe(
             data.head(),
             use_container_width=True
@@ -135,7 +157,9 @@ if uploaded_file is not None:
             f"Jumlah data: {data.shape[0]} baris | {data.shape[1]} kolom"
         )
 
-        # Ambil fitur sesuai training
+        # =========================
+        # Menyesuaikan fitur training
+        # =========================
         if hasattr(model, "feature_names_in_"):
 
             expected_features = model.feature_names_in_
@@ -156,12 +180,19 @@ if uploaded_file is not None:
         else:
             data_pred = data.copy()
 
+        # =========================
         # Prediksi
+        # =========================
         prediction = model.predict(data_pred)
 
-        # Hasil prediksi saja
+        prediction_label = [
+            label_mapping.get(int(p), "Unknown")
+            for p in prediction
+        ]
+
         hasil = pd.DataFrame({
-            "Prediction": prediction
+            "Kode_Prediksi": prediction,
+            "Jenis_Serangan": prediction_label
         })
 
         st.success("🎉 Prediksi berhasil dilakukan")
@@ -174,7 +205,9 @@ if uploaded_file is not None:
             use_container_width=True
         )
 
+        # =========================
         # Download hasil
+        # =========================
         csv = hasil.to_csv(
             index=False
         ).encode("utf-8")
