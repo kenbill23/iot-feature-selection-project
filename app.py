@@ -154,22 +154,21 @@ if uploaded_file is not None:
         # =========================
         data = pd.read_csv(uploaded_file)
 
-        # Dataset yang ditampilkan ke user
         display_data = data.copy()
 
-        # Sembunyikan kolom target dari tampilan
-        hide_cols = [
-            'Label',
-            'Attack_Category',
-            'Attack_sub_category'
+        # Kolom target yang tidak perlu ditampilkan
+        target_cols = [
+            "Label",
+            "Attack_Category",
+            "Attack_sub_category"
         ]
 
         display_data = display_data.drop(
             columns=[
-                col for col in hide_cols
+                col for col in target_cols
                 if col in display_data.columns
             ],
-            errors='ignore'
+            errors="ignore"
         )
 
         st.subheader("📊 Dataset")
@@ -185,27 +184,45 @@ if uploaded_file is not None:
         )
 
         # =========================
-        # Sesuaikan fitur training
+        # Data untuk Prediksi
+        # =========================
+        data_pred = data.copy()
+
+        # Hapus target jika ada
+        data_pred = data_pred.drop(
+            columns=[
+                col for col in target_cols
+                if col in data_pred.columns
+            ],
+            errors="ignore"
+        )
+
+        # =========================
+        # Sesuaikan dengan fitur model
         # =========================
         if hasattr(model, "feature_names_in_"):
 
-            expected_features = model.feature_names_in_
+            expected_features = [
+                col
+                for col in model.feature_names_in_
+                if col not in target_cols
+            ]
 
             missing_features = [
-                col for col in expected_features
-                if col not in data.columns
+                col
+                for col in expected_features
+                if col not in data_pred.columns
             ]
 
             if missing_features:
+
                 st.error(
-                    f"Kolom yang dibutuhkan model tidak ditemukan: {missing_features}"
+                    f"Kolom fitur yang belum tersedia: {missing_features}"
                 )
+
                 st.stop()
 
-            data_pred = data[expected_features]
-
-        else:
-            data_pred = data.copy()
+            data_pred = data_pred[expected_features]
 
         # =========================
         # Prediksi
@@ -213,18 +230,27 @@ if uploaded_file is not None:
         prediction = model.predict(data_pred)
 
         prediction_label = [
-            label_mapping.get(int(p), "Unknown")
-            for p in prediction
+            label_mapping.get(
+                int(pred),
+                "Unknown"
+            )
+            for pred in prediction
         ]
 
-        hasil = pd.DataFrame({
-            "Kode Prediksi": prediction,
-            "Jenis Serangan": prediction_label
-        })
+        hasil = pd.DataFrame(
+            {
+                "Kode Prediksi": prediction,
+                "Jenis Serangan": prediction_label
+            }
+        )
 
-        st.success("🎉 Prediksi berhasil dilakukan")
+        st.success(
+            "🎉 Prediksi berhasil dilakukan"
+        )
 
-        st.subheader("📈 Hasil Prediksi")
+        st.subheader(
+            "📈 Hasil Prediksi"
+        )
 
         st.dataframe(
             hasil,
@@ -234,7 +260,7 @@ if uploaded_file is not None:
         )
 
         # =========================
-        # Download Hasil
+        # Download
         # =========================
         csv = hasil.to_csv(
             index=False
@@ -248,4 +274,7 @@ if uploaded_file is not None:
         )
 
     except Exception as e:
-        st.error(f"Terjadi kesalahan: {e}")
+
+        st.error(
+            f"Terjadi kesalahan: {str(e)}"
+        )
