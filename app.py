@@ -122,20 +122,20 @@ if uploaded_file is not None:
 
     try:
 
-        # Load Dataset
+        # Load dataset
         data = pd.read_csv(uploaded_file)
 
         st.subheader("📊 Dataset")
-        st.dataframe(data.head())
+        st.dataframe(
+            data.head(),
+            use_container_width=True
+        )
 
         st.info(
             f"Jumlah data: {data.shape[0]} baris | {data.shape[1]} kolom"
         )
 
-        # =========================
-        # Menyesuaikan fitur training
-        # =========================
-
+        # Ambil fitur sesuai training
         if hasattr(model, "feature_names_in_"):
 
             expected_features = model.feature_names_in_
@@ -156,13 +156,10 @@ if uploaded_file is not None:
         else:
             data_pred = data.copy()
 
-        # =========================
         # Prediksi
-        # =========================
-
         prediction = model.predict(data_pred)
 
-        # Hanya tampilkan hasil prediksi
+        # Hasil prediksi saja
         hasil = pd.DataFrame({
             "Prediction": prediction
         })
@@ -170,12 +167,14 @@ if uploaded_file is not None:
         st.success("🎉 Prediksi berhasil dilakukan")
 
         st.subheader("📈 Hasil Prediksi")
-        st.dataframe(hasil)
 
-        # =========================
-        # Download Hasil
-        # =========================
+        st.dataframe(
+            hasil,
+            height=350,
+            use_container_width=True
+        )
 
+        # Download hasil
         csv = hasil.to_csv(
             index=False
         ).encode("utf-8")
