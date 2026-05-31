@@ -66,6 +66,24 @@ def load_model():
 model = load_model()
 
 # =========================
+# Label Mapping
+# =========================
+label_mapping = {
+    0: "ARPPoisoning",
+    1: "Backdoor",
+    2: "ICMPflood",
+    3: "ICMPredirect",
+    4: "Normal",
+    5: "Password_crack",
+    6: "Port_Scanning",
+    7: "SQLInjection",
+    8: "SYN_FLOOD",
+    9: "Smurf",
+    10: "UDP_flood",
+    11: "Vulnerability_Scan"
+}
+
+# =========================
 # Sidebar
 # =========================
 st.sidebar.title("🎀 IoT Vulnerability")
@@ -156,7 +174,7 @@ if uploaded_file is not None:
 
         st.dataframe(
             display_data.head(),
-            width="stretch",
+            use_container_width=True,
             hide_index=True
         )
 
@@ -182,11 +200,7 @@ if uploaded_file is not None:
         # =========================
         if hasattr(model, "feature_names_in_"):
 
-            expected_features = [
-                col
-                for col in model.feature_names_in_
-                if col not in target_cols
-            ]
+            expected_features = list(model.feature_names_in_)
 
             missing_features = [
                 col
@@ -209,9 +223,15 @@ if uploaded_file is not None:
         # =========================
         prediction = model.predict(data_pred)
 
+        prediction_label = [
+            label_mapping.get(int(pred), "Unknown")
+            for pred in prediction
+        ]
+
         hasil = pd.DataFrame(
             {
-                "Jenis Serangan": prediction
+                "Kode Prediksi": prediction,
+                "Jenis Serangan": prediction_label
             }
         )
 
@@ -225,9 +245,9 @@ if uploaded_file is not None:
 
         st.dataframe(
             hasil,
+            use_container_width=True,
             hide_index=True,
-            height=350,
-            width="stretch"
+            height=350
         )
 
         # =========================
