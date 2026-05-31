@@ -23,10 +23,29 @@ from imblearn.pipeline import Pipeline
 
 df = pd.read_csv("IoT_Vulnerability.csv")
 
+# =====================================
+# Target
+# =====================================
+
 target = "Attack_Category"
 
-X = df.drop(columns=[target])
+# Hilangkan semua kolom target dari fitur
+drop_cols = [
+    "Attack_Category",
+    "Label",
+    "Attack_sub_category"
+]
+
+X = df.drop(
+    columns=[c for c in drop_cols if c in df.columns],
+    errors="ignore"
+)
+
 y = df[target]
+
+# =====================================
+# Train Test Split
+# =====================================
 
 X_train, X_test, y_train, y_test = train_test_split(
     X,
@@ -37,7 +56,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # =====================================
-# Best Pipeline (hasil tuning)
+# Best Pipeline
 # =====================================
 
 best_model = Pipeline([
@@ -156,5 +175,8 @@ with mlflow.start_run(run_name="Best_Embedded_Model"):
             y_pred
         )
     )
+
+    print("\nJumlah fitur training:", len(X.columns))
+    print("Nama fitur pertama:", list(X.columns[:10]))
 
     print("\nModel berhasil disimpan sebagai pipeline_terbaik.pkl")
