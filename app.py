@@ -130,14 +130,24 @@ if uploaded_file is not None:
             f"Jumlah data: {data.shape[0]} baris | {data.shape[1]} kolom"
         )
 
-        # Hapus kolom Prediction jika file hasil prediksi diupload lagi
-        if "Prediction" in data.columns:
-            data = data.drop(columns=["Prediction"])
+        # Simpan data asli untuk ditampilkan
+        data_pred = data.copy()
 
-        # Prediksi menggunakan pipeline lengkap
-        prediction = model.predict(data)
+        # Hapus kolom yang bukan fitur model
+        drop_cols = [
+            "Prediction",
+            "Attack_sub_category",
+            "Attack_Category"
+        ]
 
-        # Tambahkan hasil prediksi
+        for col in drop_cols:
+            if col in data_pred.columns:
+                data_pred = data_pred.drop(columns=[col])
+
+        # Prediksi menggunakan pipeline
+        prediction = model.predict(data_pred)
+
+        # Tambahkan hasil prediksi ke data asli
         hasil = data.copy()
         hasil["Prediction"] = prediction
 
