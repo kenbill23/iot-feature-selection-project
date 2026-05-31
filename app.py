@@ -154,16 +154,34 @@ if uploaded_file is not None:
         # =========================
         data = pd.read_csv(uploaded_file)
 
+        # Dataset yang ditampilkan ke user
+        display_data = data.copy()
+
+        # Sembunyikan kolom target dari tampilan
+        hide_cols = [
+            'Label',
+            'Attack_Category',
+            'Attack_sub_category'
+        ]
+
+        display_data = display_data.drop(
+            columns=[
+                col for col in hide_cols
+                if col in display_data.columns
+            ],
+            errors='ignore'
+        )
+
         st.subheader("📊 Dataset")
 
         st.dataframe(
-            data.head(),
+            display_data.head(),
             width="stretch",
             hide_index=True
         )
 
         st.info(
-            f"Jumlah data: {data.shape[0]} baris | {data.shape[1]} kolom"
+            f"Jumlah data: {display_data.shape[0]} baris | {display_data.shape[1]} kolom"
         )
 
         # =========================
