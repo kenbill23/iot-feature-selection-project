@@ -66,24 +66,6 @@ def load_model():
 model = load_model()
 
 # =========================
-# Label Mapping
-# =========================
-label_mapping = {
-    0: 'ARPPoisoning',
-    1: 'Backdoor',
-    2: 'ICMPflood',
-    3: 'ICMPredirect',
-    4: 'Normal',
-    5: 'Password_crack',
-    6: 'Port_Scanning',
-    7: 'SQLInjection',
-    8: 'SYN_FLOOD',
-    9: 'Smurf',
-    10: 'UDP_flood',
-    11: 'VUlnerability_Scan'
-}
-
-# =========================
 # Sidebar
 # =========================
 st.sidebar.title("🎀 IoT Vulnerability")
@@ -156,7 +138,6 @@ if uploaded_file is not None:
 
         display_data = data.copy()
 
-        # Kolom target yang tidak perlu ditampilkan
         target_cols = [
             "Label",
             "Attack_Category",
@@ -184,11 +165,10 @@ if uploaded_file is not None:
         )
 
         # =========================
-        # Data untuk Prediksi
+        # Data Prediksi
         # =========================
         data_pred = data.copy()
 
-        # Hapus target jika ada
         data_pred = data_pred.drop(
             columns=[
                 col for col in target_cols
@@ -198,7 +178,7 @@ if uploaded_file is not None:
         )
 
         # =========================
-        # Sesuaikan dengan fitur model
+        # Sesuaikan Fitur Model
         # =========================
         if hasattr(model, "feature_names_in_"):
 
@@ -229,18 +209,9 @@ if uploaded_file is not None:
         # =========================
         prediction = model.predict(data_pred)
 
-        prediction_label = [
-            label_mapping.get(
-                int(pred),
-                "Unknown"
-            )
-            for pred in prediction
-        ]
-
         hasil = pd.DataFrame(
             {
-                "Kode Prediksi": prediction,
-                "Jenis Serangan": prediction_label
+                "Jenis Serangan": prediction
             }
         )
 

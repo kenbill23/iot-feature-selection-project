@@ -29,7 +29,6 @@ df = pd.read_csv("IoT_Vulnerability.csv")
 
 target = "Attack_Category"
 
-# Hilangkan semua kolom target dari fitur
 drop_cols = [
     "Attack_Category",
     "Label",
@@ -116,19 +115,22 @@ with mlflow.start_run(run_name="Best_Embedded_Model"):
     precision = precision_score(
         y_test,
         y_pred,
-        average="macro"
+        average="macro",
+        zero_division=0
     )
 
     recall = recall_score(
         y_test,
         y_pred,
-        average="macro"
+        average="macro",
+        zero_division=0
     )
 
     f1 = f1_score(
         y_test,
         y_pred,
-        average="macro"
+        average="macro",
+        zero_division=0
     )
 
     mlflow.log_params({
@@ -169,10 +171,12 @@ with mlflow.start_run(run_name="Best_Embedded_Model"):
     print(f"F1 Score : {f1:.4f}")
 
     print("\n=== CLASSIFICATION REPORT ===")
+
     print(
         classification_report(
             y_test,
-            y_pred
+            y_pred,
+            zero_division=0
         )
     )
 
