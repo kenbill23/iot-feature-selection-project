@@ -103,6 +103,7 @@ Revi
 # Judul
 # =========================
 st.title("🎀 IoT Vulnerability Classification")
+
 st.write(
     "Upload dataset CSV untuk melakukan prediksi kerentanan perangkat IoT."
 )
@@ -120,7 +121,8 @@ uploaded_file = st.file_uploader(
 if uploaded_file is not None:
 
     try:
-        # Load dataset
+
+        # Load Dataset
         data = pd.read_csv(uploaded_file)
 
         st.subheader("📊 Dataset")
@@ -131,7 +133,7 @@ if uploaded_file is not None:
         )
 
         # =========================
-        # Ambil fitur sesuai training
+        # Menyesuaikan fitur training
         # =========================
 
         if hasattr(model, "feature_names_in_"):
@@ -160,16 +162,20 @@ if uploaded_file is not None:
 
         prediction = model.predict(data_pred)
 
-        # Tambahkan hasil prediksi
-        hasil = data.copy()
-        hasil["Prediction"] = prediction
+        # Hanya tampilkan hasil prediksi
+        hasil = pd.DataFrame({
+            "Prediction": prediction
+        })
 
         st.success("🎉 Prediksi berhasil dilakukan")
 
         st.subheader("📈 Hasil Prediksi")
-        st.dataframe(hasil.head())
+        st.dataframe(hasil)
 
-        # Download hasil
+        # =========================
+        # Download Hasil
+        # =========================
+
         csv = hasil.to_csv(
             index=False
         ).encode("utf-8")
