@@ -23,7 +23,6 @@ from imblearn.pipeline import Pipeline
 
 df = pd.read_csv("IoT_Vulnerability.csv")
 
-# GANTI jika target berbeda
 target = "Attack_Category"
 
 X = df.drop(columns=[target])
@@ -33,12 +32,12 @@ X_train, X_test, y_train, y_test = train_test_split(
     X,
     y,
     test_size=0.2,
-    random_state=42,
-    stratify=y
+    stratify=y,
+    random_state=42
 )
 
 # =====================================
-# Pipeline Terbaik
+# Best Pipeline (hasil tuning)
 # =====================================
 
 best_model = Pipeline([
@@ -55,7 +54,7 @@ best_model = Pipeline([
                 n_estimators=5,
                 max_depth=5,
                 random_state=42,
-                n_jobs=1
+                n_jobs=-1
             )
         )
     ),
@@ -66,20 +65,20 @@ best_model = Pipeline([
             n_estimators=10,
             max_depth=5,
             random_state=42,
-            n_jobs=1
+            n_jobs=-1
         )
     )
 ])
 
 # =====================================
-# MLflow Tracking
+# MLflow
 # =====================================
 
 mlflow.set_experiment(
     "IoT_Vulnerability_Classification"
 )
 
-with mlflow.start_run():
+with mlflow.start_run(run_name="Best_Embedded_Model"):
 
     best_model.fit(
         X_train,
@@ -115,11 +114,13 @@ with mlflow.start_run():
 
     mlflow.log_params({
 
-        "model__n_estimators": 10,
-        "model__max_depth": 5,
+        "feature_selection_method": "SelectFromModel",
 
         "feature_selection__estimator__n_estimators": 5,
-        "feature_selection__estimator__max_depth": 5
+        "feature_selection__estimator__max_depth": 5,
+
+        "model__n_estimators": 10,
+        "model__max_depth": 5
 
     })
 
@@ -133,7 +134,7 @@ with mlflow.start_run():
     })
 
     mlflow.sklearn.log_model(
-        best_model,
+        sk_model=best_model,
         artifact_path="model"
     )
 
@@ -142,9 +143,18 @@ with mlflow.start_run():
         "pipeline_terbaik.pkl"
     )
 
-    print("Model berhasil disimpan")
+    print("\n=== HASIL EVALUASI ===")
+    print(f"Accuracy : {accuracy:.4f}")
+    print(f"Precision: {precision:.4f}")
+    print(f"Recall   : {recall:.4f}")
+    print(f"F1 Score : {f1:.4f}")
 
-    print(classification_report(
-        y_test,
-        y_pred
-    ))
+    print("\n=== CLASSIFICATION REPORT ===")
+    print(
+        classification_report(
+            y_test,
+            y_pred
+        )
+    )
+
+    print("\nModel berhasil disimpan sebagai pipeline_terbaik.pkl")
