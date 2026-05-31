@@ -108,35 +108,35 @@ with tab1:
 
     if st.button("🎯 Prediksi Manual"):
 
-    try:
-        input_data = pd.DataFrame([{
-            'dur': dur,
-            'Protocol': protocol,
-            'Length': length,
-            'Source Host': source_host,
-            'Destination Host': destination_host,
-            'Sender IP address': sender_ip,
-            'Target IP address': target_ip
-        }])
+        try:
+            input_data = pd.DataFrame([{
+                'dur': dur,
+                'Protocol': protocol,
+                'Length': length,
+                'Source Host': source_host,
+                'Destination Host': destination_host,
+                'Sender IP address': sender_ip,
+                'Target IP address': target_ip
+            }])
 
-        prediction = model.predict(input_data)
+            prediction = model.predict(input_data)
 
-        st.success("🎉 Prediksi berhasil dilakukan")
+            st.success("🎉 Prediksi berhasil dilakukan")
 
-        st.subheader("📊 Data Input")
-        st.dataframe(input_data)
+            st.subheader("📊 Data Input")
+            st.dataframe(input_data)
 
-        st.subheader("🎯 Hasil Prediksi")
+            st.subheader("🎯 Hasil Prediksi")
 
-        hasil = prediction[0]
+            hasil = prediction[0]
 
-        st.metric(
-            label="Prediction",
-            value=str(hasil)
-        )
+            st.metric(
+                label="Prediction",
+                value=str(hasil)
+            )
 
-    except Exception as e:
-        st.error(f"Terjadi kesalahan saat prediksi: {e}")
+        except Exception as e:
+            st.error(f"Terjadi kesalahan saat prediksi: {e}")
 
 # ==================================================
 # TAB UPLOAD CSV
